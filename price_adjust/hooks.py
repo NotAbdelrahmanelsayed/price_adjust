@@ -1,7 +1,9 @@
 app_name = "price_adjust"
 app_title = "Price Adjust"
 app_publisher = "Abdelrahman Elsayed"
-app_description = "Automatically apply scheduled, rule-based price increases with full control"
+app_description = (
+    "Automatically apply scheduled, rule-based price increases with full control"
+)
 app_email = "bedoelsayed785@gmail.com"
 app_license = "mit"
 
@@ -137,34 +139,23 @@ app_license = "mit"
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-# 	}
-# }
+# extend_doctype_class = {"Subscription": "price_adjust.extensions.subscription.Subscription"}
+doc_events = {
+    "Subscription": {
+        "validate": [
+            "price_adjust.extensions.subscription.validate_increase_by_interval",
+            "price_adjust.extensions.subscription.init_next_increase_date"
+            # "price_adjust.extensions.subscription.apply_increase_and_set_next_date",
+        ]
+    }
+}
 
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
-# 	"all": [
-# 		"price_adjust.tasks.all"
-# 	],
-# 	"daily": [
-# 		"price_adjust.tasks.daily"
-# 	],
-# 	"hourly": [
-# 		"price_adjust.tasks.hourly"
-# 	],
-# 	"weekly": [
-# 		"price_adjust.tasks.weekly"
-# 	],
-# 	"monthly": [
-# 		"price_adjust.tasks.monthly"
-# 	],
-# }
+scheduler_events = {
+    "daily": ["price_adjust.extensions.subscription.auto_increase_by_interval"],
+}
 
 # Testing
 # -------
@@ -246,4 +237,3 @@ app_license = "mit"
 # ------------
 # List of apps whose translatable strings should be excluded from this app's translations.
 # ignore_translatable_strings_from = []
-

@@ -72,7 +72,7 @@ def apply_increase_and_set_next_date(doc, method=None):
 	return doc
 
 
-def init_next_increase_date(doc):
+def init_next_increase_date(doc, method=None):
     if doc.custom_auto_increase_by_interval != 1:
         return
 

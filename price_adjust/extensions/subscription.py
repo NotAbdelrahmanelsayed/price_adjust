@@ -7,7 +7,7 @@ def auto_increase_by_interval():
 	subscriptions = frappe.get_all(
 		"Subscription",
 		filters={
-			"status": "Active",
+			"status": ["not in", ["Completed","Cancelled"]],
 			"custom_auto_increase_by_interval": 1,
 			"custom_next_fee_increase_date": ["<=", today()],
 		},

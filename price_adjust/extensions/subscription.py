@@ -2,7 +2,6 @@ import frappe
 from frappe.utils import add_days, add_months, add_years, today
 from datetime import date
 
-
 def auto_increase_by_interval():
 	subscriptions = frappe.get_all(
 		"Subscription",
@@ -31,7 +30,7 @@ def validate_increase_by_interval(doc, method=None):
 		frappe.throw("increase duration count cannot be less than 1")
 
 	if doc.custom_increase_percentage <= 0:
-		frappe.throw("increase duration count cannot be less than 0")
+		frappe.throw("Increase percentage must be greater than 0")
 
 def apply_increase_and_set_next_date(doc, method=None):
 	if not doc.get("plans") or not doc.get("custom_increase_duration_count"):
@@ -94,3 +93,10 @@ def init_next_increase_date(doc, method=None):
         doc.custom_next_fee_increase_date = add_months(base_date, n)
     elif interval == "Year":
         doc.custom_next_fee_increase_date = add_years(base_date, n)
+
+@frappe.whitelist()
+def force_increase(docname):
+    doc = frappe.get_doc("Subscription", docname)
+    apply_increase_and_set_next_date(doc)
+    doc.save(ignore_permissions=True)
+    return doc.custom_next_fee_increase_date

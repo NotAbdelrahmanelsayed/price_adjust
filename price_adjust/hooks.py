@@ -131,9 +131,9 @@ app_license = "mit"
 # ---------------
 # Override standard doctype classes
 
-# override_doctype_class = {
-# 	"ToDo": "custom_app.overrides.CustomToDo"
-# }
+override_doctype_class = {
+	"Subscription": "price_adjust.extensions.marketing_fees.CustomSubscription"
+}
 
 # Document Events
 # ---------------
@@ -150,11 +150,15 @@ doc_events = {
     }
 }
 
+doctype_js = {
+    "Subscription": "public/js/subscription.js"
+}
+
 # Scheduled Tasks
 # ---------------
 
 scheduler_events = {
-    "daily": ["price_adjust.extensions.subscription.auto_increase_by_interval"],
+    "hourly": ["price_adjust.extensions.subscription.auto_increase_by_interval"],
 }
 
 # Testing

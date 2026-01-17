@@ -47,7 +47,7 @@ class CustomSubscription(Subscription):
 		return invoice
 
 	def validate_not_submitable_invoice(self):
-		if self.custom_marketing_percentage > 0 and self.submit_invoice == 1:
+		if self.custom_marketing_percentage and self.submit_invoice == 1:
 			frappe.throw("Can't add marketing fees if `Submit Generated Invoice` checked.")
 
 

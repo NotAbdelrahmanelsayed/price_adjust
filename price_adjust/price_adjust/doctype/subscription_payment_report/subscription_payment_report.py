@@ -1,6 +1,8 @@
 # Copyright (c) 2026, Abdelrahman Elsayed and contributors
 # For license information, please see license.txt
 
+# import frappe
+
 import frappe
 from frappe.model.document import Document
 from frappe.model import child_table_fields
@@ -13,7 +15,7 @@ import json
 from frappe.utils import get_date_str
 
 
-class SubscriptionStatement(Document):
+class SubscriptionPaymentReport(Document):
 	def validate(self):
 		self.set("enteries", [])
 		filters = self._get_filters()
@@ -136,3 +138,4 @@ class SubscriptionStatement(Document):
 
 	def autoname(self):
 		self.name = f"{self.customer} {self.from_date} {self.to_date}"
+

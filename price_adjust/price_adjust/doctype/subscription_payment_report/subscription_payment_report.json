@@ -1,6 +1,6 @@
 {
  "actions": [],
- "creation": "2026-01-19 23:08:17.048051",
+ "creation": "2026-01-22 23:40:18.310417",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
@@ -69,11 +69,12 @@
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
+ "issingle": 1,
  "links": [],
- "modified": "2026-01-21 23:37:39.924255",
+ "modified": "2026-01-22 23:40:18.310417",
  "modified_by": "Administrator",
  "module": "Price Adjust",
- "name": "Subscription Statement",
+ "name": "Subscription Payment Report",
  "naming_rule": "By script",
  "owner": "Administrator",
  "permissions": [
@@ -81,10 +82,8 @@
    "create": 1,
    "delete": 1,
    "email": 1,
-   "export": 1,
    "print": 1,
    "read": 1,
-   "report": 1,
    "role": "System Manager",
    "share": 1,
    "write": 1

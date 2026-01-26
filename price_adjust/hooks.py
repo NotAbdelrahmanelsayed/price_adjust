@@ -158,7 +158,7 @@ doctype_js = {
 # ---------------
 
 scheduler_events = {
-    "hourly": ["price_adjust.extensions.subscription.auto_increase_by_interval"],
+    "daily": ["price_adjust.extensions.subscription.auto_increase_by_interval"],
 }
 
 # Testing

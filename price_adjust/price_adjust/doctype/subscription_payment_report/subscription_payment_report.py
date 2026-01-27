@@ -5,10 +5,6 @@
 
 import frappe
 from frappe.model.document import Document
-from frappe.model import child_table_fields
-from erpnext.accounts.doctype.journal_entry.journal_entry import (
-	get_payment_entry_against_invoice,
-)
 from erpnext.accounts.utils import get_balance_on
 from collections import defaultdict
 import json
@@ -19,10 +15,16 @@ class SubscriptionPaymentReport(Document):
 	def validate(self):
 		self.set("enteries", [])
 		filters = self._get_filters()
-		frappe.log(filters)
 		enteries = self._get_enteries(filters)
-
+		seen = set()
+		self.unique_invoices = []
 		for entry in enteries:
+			# Make sure invoice is unique
+			if entry.voucher_no in seen:
+				continue
+			seen.add(entry.voucher_no)
+			self.unique_invoices.append(entry.voucher_no)
+
 			invoice = frappe.get_doc(entry.voucher_type, entry.voucher_no)
 			items = defaultdict(list)
 			for item in invoice.items:
@@ -32,6 +34,7 @@ class SubscriptionPaymentReport(Document):
 				items["item_qty"].append(item.qty)
 				items["item_rate"].append(item.rate)
 				items["item_total"].append(item.net_amount)
+				items["uom"].append(item.uom)
 
 			refs = frappe.get_all(
 				"Payment Entry Reference",
@@ -64,6 +67,7 @@ class SubscriptionPaymentReport(Document):
 						],
 					)
 				}
+			refs = [r for r in refs if r["voucher_no"] in pe_map]
 			for r in refs:
 				pe = pe_map.get(r["voucher_no"])
 				if pe:
@@ -83,9 +87,9 @@ class SubscriptionPaymentReport(Document):
 					"voucher_type": entry.voucher_type,
 					"voucher_no": entry.voucher_no,
 					"voucher_status": invoice.status,
-					"date": entry.posting_date,
+					"date": invoice.posting_date,
 					"amount": invoice.grand_total,
-					"remarks": entry.remarks,
+					# "remarks": entry.remarks,
 					"total_amount": invoice.grand_total,
 					"total_quantity": invoice.total_qty,
 					"items": json.dumps(items, ensure_ascii=False),
@@ -93,7 +97,7 @@ class SubscriptionPaymentReport(Document):
 				},
 			)
 
-		self.set_outstanding()
+		self.set_customer_account_statement()
 
 	def _get_enteries(self, filters):
 		return frappe.db.get_all(
@@ -111,16 +115,23 @@ class SubscriptionPaymentReport(Document):
 			order_by="posting_date",
 		)
 
-	def set_outstanding(self):
-		if self.customer:
-			self.outstanding_amount = get_balance_on(
-				date=self.to_date, party_type="Customer", party=self.customer
+	def get_outstanding(self):
+
+		outstanding = sum(
+			v or 0
+			for v in frappe.get_all(
+				"Sales Invoice",
+				filters=[["name", "in", self.unique_invoices]],
+				pluck="outstanding_amount",
 			)
+		)
+		return outstanding
 
 	def _get_filters(self):
 		filters = {
 			"voucher_type": "Sales Invoice",
 			"party_type": "Customer",
+			"is_cancelled": 0
 		}
 		if self.from_date and self.to_date:
 			filters["posting_date"] = ["between", [self.from_date, self.to_date]]
@@ -131,11 +142,56 @@ class SubscriptionPaymentReport(Document):
 		if self.customer:
 			filters["party"] = self.customer
 
-		if self.ignore_cancelled:
-			filters["is_cancelled"] = 0
-
 		return filters
 
 	def autoname(self):
 		self.name = f"{self.customer} {self.from_date} {self.to_date}"
 
+	def get_customer_advance_account(self):
+		rows = frappe.get_all(
+			"Payment Entry",
+			fields=["SUM(unallocated_amount) AS adv"],
+			filters={
+				"docstatus": 1,
+				"party_type": "Customer",
+				"party": self.customer,
+			},
+			pluck="adv",
+		)
+		return rows[0] or 0
+
+	def set_last_payment_details(self):
+		last_payment = None
+		for entry in self.enteries:
+			pays = json.loads(entry.payments or "[]")
+			for p in pays:
+				if p.get("posting_date"):
+					d = p["posting_date"]
+					if not last_payment or d > last_payment["date"]:
+						last_payment = {"date": d, "amount": p.get("allocated_amount") or p.get("paid_amount")}
+
+		if last_payment:
+			self.last_payment_date = last_payment["date"]
+			self.last_payment_amount = last_payment["amount"]
+
+	def set_customer_account_statement(self):
+		filters = self._get_filters()
+
+		si_totals = frappe.get_all(
+			"Sales Invoice",
+			fields=["SUM(grand_total) AS grand_total", "SUM(total_qty) AS total_qty"],
+			filters={
+				"docstatus": 1,
+				"customer": ["=", self.customer],
+				"posting_date": filters["posting_date"],
+			}
+			,
+		)
+		invoiced_amount = si_totals[0].grand_total or 0
+		total_qty = si_totals[0].total_qty or 0
+
+		self.set("outstanding_amount", self.get_outstanding())
+		self.set("invoiced_amount", invoiced_amount)
+		self.set("total_quantity", total_qty)
+		self.set("paid_amount", invoiced_amount - self.outstanding_amount)
+		self.set_last_payment_details()

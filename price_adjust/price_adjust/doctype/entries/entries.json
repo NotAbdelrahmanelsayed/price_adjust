@@ -14,8 +14,8 @@
   "voucher_status",
   "summary_section",
   "date",
+  "column_break_rvov",
   "amount",
-  "column_break_summary_1",
   "remarks",
   "invoice_section",
   "items",
@@ -24,138 +24,136 @@
   "total_amount",
   "payment_section",
   "payments"
-]
-,
+ ],
  "fields": [
   {
-    "fieldname": "party_section",
-    "fieldtype": "Section Break",
-    "label": "Customer & Voucher"
+   "fieldname": "party_section",
+   "fieldtype": "Section Break",
+   "label": "Customer & Voucher"
   },
   {
-    "fieldname": "customer",
-    "fieldtype": "Link",
-    "label": "Customer",
-    "options": "Customer",
-    "read_only": 1
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "label": "Customer",
+   "options": "Customer",
+   "read_only": 1
   },
   {
-    "fieldname": "customer_name",
-    "fieldtype": "Data",
-    "label": "Customer Name",
-    "read_only": 1
+   "fieldname": "customer_name",
+   "fieldtype": "Data",
+   "label": "Customer Name",
+   "read_only": 1
   },
   {
-    "fieldname": "column_break_party_1",
-    "fieldtype": "Column Break"
+   "fieldname": "column_break_party_1",
+   "fieldtype": "Column Break"
   },
   {
-    "fieldname": "voucher_no",
-    "fieldtype": "Link",
-    "in_filter": 1,
-    "in_list_view": 1,
-    "in_preview": 1,
-    "in_standard_filter": 1,
-    "label": "Voucher No",
-    "options": "Sales Invoice"
+   "fieldname": "voucher_no",
+   "fieldtype": "Link",
+   "in_filter": 1,
+   "in_list_view": 1,
+   "in_preview": 1,
+   "in_standard_filter": 1,
+   "label": "Voucher No",
+   "options": "Sales Invoice",
+   "read_only": 1
   },
   {
-    "fieldname": "voucher_type",
-    "fieldtype": "Link",
-    "in_filter": 1,
-    "in_list_view": 1,
-    "in_preview": 1,
-    "in_standard_filter": 1,
-    "label": "Voucher Type",
-    "options": "Global Search DocType"
+   "fieldname": "voucher_type",
+   "fieldtype": "Link",
+   "in_filter": 1,
+   "in_list_view": 1,
+   "in_preview": 1,
+   "in_standard_filter": 1,
+   "label": "Voucher Type",
+   "options": "Global Search DocType",
+   "read_only": 1
   },
   {
-    "fieldname": "voucher_status",
-    "fieldtype": "Data",
-    "label": "Voucher Status",
-    "read_only": 1
-  },
-
-  {
-    "fieldname": "summary_section",
-    "fieldtype": "Section Break",
-    "label": "Summary"
+   "fieldname": "voucher_status",
+   "fieldtype": "Data",
+   "label": "Voucher Status",
+   "read_only": 1
   },
   {
-    "fieldname": "date",
-    "fieldtype": "Date",
-    "in_filter": 1,
-    "in_list_view": 1,
-    "in_preview": 1,
-    "in_standard_filter": 1,
-    "label": "Date",
-    "read_only": 1
+   "fieldname": "summary_section",
+   "fieldtype": "Section Break",
+   "label": "Summary"
   },
   {
-    "fieldname": "amount",
-    "fieldtype": "Currency",
-    "in_filter": 1,
-    "in_list_view": 1,
-    "in_preview": 1,
-    "in_standard_filter": 1,
-    "label": "Amount",
-    "read_only": 1
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "in_filter": 1,
+   "in_list_view": 1,
+   "in_preview": 1,
+   "in_standard_filter": 1,
+   "label": "Date",
+   "read_only": 1
   },
   {
-    "fieldname": "column_break_summary_1",
-    "fieldtype": "Column Break"
+   "fieldname": "amount",
+   "fieldtype": "Currency",
+   "in_filter": 1,
+   "in_list_view": 1,
+   "in_preview": 1,
+   "in_standard_filter": 1,
+   "label": "Amount",
+   "read_only": 1
   },
   {
-    "fieldname": "remarks",
-    "fieldtype": "Data",
-    "label": "Remarks",
-    "read_only": 1
-  },
-
-  {
-    "fieldname": "invoice_section",
-    "fieldtype": "Section Break",
-    "label": "Sales Invoice Details"
+   "fieldname": "remarks",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Remarks",
+   "read_only": 1
   },
   {
-    "fieldname": "items",
-    "fieldtype": "JSON",
-    "label": "Items"
+   "fieldname": "invoice_section",
+   "fieldtype": "Section Break",
+   "label": "Sales Invoice Details"
   },
   {
-    "fieldname": "total_quantity",
-    "fieldtype": "Int",
-    "label": "Total Quantity",
-    "read_only": 1
+   "fieldname": "items",
+   "fieldtype": "JSON",
+   "label": "Items"
   },
   {
-    "fieldname": "column_break_invoice_1",
-    "fieldtype": "Column Break"
+   "fieldname": "total_quantity",
+   "fieldtype": "Int",
+   "label": "Total Quantity",
+   "read_only": 1
   },
   {
-    "fieldname": "total_amount",
-    "fieldtype": "Currency",
-    "label": "Total Amount",
-    "read_only": 1
-  },
-
-  {
-    "fieldname": "payment_section",
-    "fieldtype": "Section Break",
-    "label": "Payment"
+   "fieldname": "column_break_invoice_1",
+   "fieldtype": "Column Break"
   },
   {
-    "fieldname": "payments",
-    "fieldtype": "JSON",
-    "label": "Payments"
+   "fieldname": "total_amount",
+   "fieldtype": "Currency",
+   "label": "Total Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "payment_section",
+   "fieldtype": "Section Break",
+   "label": "Payment"
+  },
+  {
+   "fieldname": "payments",
+   "fieldtype": "JSON",
+   "label": "Payments"
+  },
+  {
+   "fieldname": "column_break_rvov",
+   "fieldtype": "Column Break"
   }
-]
-,
+ ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-01-21 23:32:48.088848",
+ "modified": "2026-01-28 00:22:57.120775",
  "modified_by": "Administrator",
  "module": "Price Adjust",
  "name": "Entries",

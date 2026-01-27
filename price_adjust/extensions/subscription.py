@@ -36,7 +36,7 @@ def apply_increase_and_set_next_date(doc, method=None):
 
 	if doc.get("custom_auto_increase_by_interval") != 1:
 		return
-
+	
 	# Adjust subscription
 	if doc.custom_increase_percentage:
 		rows = doc.plans

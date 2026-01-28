@@ -117,15 +117,19 @@ class SubscriptionPaymentReport(Document):
 
 	def get_outstanding(self):
 
-		outstanding = sum(
-			v or 0
-			for v in frappe.get_all(
-				"Sales Invoice",
-				filters=[["name", "in", self.unique_invoices]],
-				pluck="outstanding_amount",
-			)
+		# outstanding = sum(
+		# 	v or 0
+		# 	for v in frappe.get_all(
+		# 		"Sales Invoice",
+		# 		filters=[["name", "in", self.unique_invoices]],
+		# 		pluck="outstanding_amount",
+		# 	)
+		# )
+		# return outstanding
+		outstanding_amount = get_balance_on(
+			date=self.to_date, party_type="Customer", party=self.customer
 		)
-		return outstanding
+		return outstanding_amount
 
 	def _get_filters(self):
 		filters = {

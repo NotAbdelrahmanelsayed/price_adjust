@@ -132,7 +132,7 @@ app_license = "mit"
 # Override standard doctype classes
 
 override_doctype_class = {
-	"Subscription": "price_adjust.extensions.marketing_fees.CustomSubscription"
+    "Subscription": "price_adjust.extensions.marketing_fees.CustomSubscription"
 }
 
 # Document Events
@@ -144,21 +144,19 @@ doc_events = {
     "Subscription": {
         "validate": [
             "price_adjust.extensions.subscription.validate_increase_by_interval",
-            "price_adjust.extensions.subscription.init_next_increase_date"
+            "price_adjust.extensions.subscription.init_next_increase_date",
             # "price_adjust.extensions.subscription.apply_increase_and_set_next_date",
         ]
     }
 }
 
-doctype_js = {
-    "Subscription": "public/js/subscription.js"
-}
+doctype_js = {"Subscription": "public/js/subscription.js"}
 
 # Scheduled Tasks
 # ---------------
 
 scheduler_events = {
-    "daily": ["price_adjust.extensions.subscription.auto_increase_by_interval"],
+    "hourly": ["price_adjust.extensions.subscription.auto_increase_by_interval"],
 }
 
 # Testing

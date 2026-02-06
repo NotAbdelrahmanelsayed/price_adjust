@@ -37,7 +37,7 @@ def validate_increase_by_interval(doc, method=None):
         frappe.throw("Increase percentage must be greater than 0")
 
 
-def apply_increase_and_set_next_date(doc, method=None):
+def apply_increase_and_set_next_date(doc, method=None, force_increase=False):
     if not doc.get("plans") or not doc.get("custom_increase_duration_count"):
         return
 
@@ -52,7 +52,10 @@ def apply_increase_and_set_next_date(doc, method=None):
             plan = frappe.get_doc("Subscription Plan", row.plan)
 
             # If the plan modified today, ignore it.
-            if get_date_str(plan.custom_last_modified or today_str) == today_str:
+            if (
+                get_date_str(plan.custom_last_modified or today_str) == today_str
+                and not force_increase
+            ):
                 continue
             cost = plan.cost * (1 + (doc.custom_increase_percentage / 100))
             frappe.db.set_value("Subscription Plan", plan.name, "cost", cost)
@@ -97,5 +100,5 @@ def init_next_increase_date(doc, method=None):
 @frappe.whitelist()
 def force_increase(docname):
     doc = frappe.get_doc("Subscription", docname)
-    apply_increase_and_set_next_date(doc)
+    apply_increase_and_set_next_date(doc, force_increase=True)
     return doc.custom_next_fee_increase_date

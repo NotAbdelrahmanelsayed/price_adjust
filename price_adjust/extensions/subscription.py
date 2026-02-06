@@ -51,8 +51,8 @@ def apply_increase_and_set_next_date(doc, method=None):
         for row in rows:
             plan = frappe.get_doc("Subscription Plan", row.plan)
 
-			# If the plan modified today, ignore it.
-            if get_date_str(plan.custom_last_modified) == today_str:
+            # If the plan modified today, ignore it.
+            if get_date_str(plan.custom_last_modified or today_str) == today_str:
                 continue
             cost = plan.cost * (1 + (doc.custom_increase_percentage / 100))
             frappe.db.set_value("Subscription Plan", plan.name, "cost", cost)

@@ -1,5 +1,5 @@
 import frappe
-from frappe.utils import add_days, add_months, add_years, get_date_str, getdate, today
+from frappe.utils import add_days, add_months, add_years, flt, get_date_str, getdate, today
 
 
 def auto_increase_by_interval():
@@ -29,7 +29,7 @@ def validate_increase_by_interval(doc, method=None):
 	if not doc.custom_increase_duration_count or int(doc.custom_increase_duration_count) <= 0:
 		frappe.throw("increase duration count cannot be less than 1")
 
-	if doc.custom_increase_percentage <= 0:
+	if flt(doc.custom_increase_percentage) <= 0:
 		frappe.throw("Increase percentage must be greater than 0")
 
 
@@ -59,20 +59,24 @@ def apply_increase_and_set_next_date(doc, method=None, force_increase=False):
 			)
 
 	init_next_increase_date(doc)
+	next_date = get_next_increase_date(doc, base_date=doc.custom_next_fee_increase_date)
+	if next_date:
+		frappe.db.set_value("Subscription", doc.name, "custom_next_fee_increase_date", next_date)
+		doc.custom_next_fee_increase_date = next_date
 
 	return doc
 
 
-def init_next_increase_date(doc, method=None):
+def get_next_increase_date(doc, base_date=None):
 	if doc.custom_auto_increase_by_interval != 1:
 		return
 
-	base_date = doc.custom_next_fee_increase_date or doc.start_date or get_date_str(today())
+	base_date = base_date or doc.start_date or get_date_str(today())
 	n = int(doc.custom_increase_duration_count or 0)
 	interval = doc.custom_increase_interval
 
 	if not interval or n <= 0:
-		return
+		return None
 
 	if interval == "Day":
 		next_date = add_days(base_date, n)
@@ -82,7 +86,20 @@ def init_next_increase_date(doc, method=None):
 		next_date = add_months(base_date, n)
 	elif interval == "Year":
 		next_date = add_years(base_date, n)
-	frappe.db.set_value("Subscription", doc.name, "custom_next_fee_increase_date", next_date)
+	else:
+		return None
+	return next_date
+
+
+def init_next_increase_date(doc, method=None):
+	if doc.custom_auto_increase_by_interval != 1 or doc.custom_next_fee_increase_date:
+		return
+
+	next_date = get_next_increase_date(doc)
+	if not next_date:
+		return
+
+	doc.custom_next_fee_increase_date = next_date
 
 
 @frappe.whitelist()

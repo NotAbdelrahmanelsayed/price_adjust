@@ -3,11 +3,12 @@
 
 # import frappe
 
-import frappe
-from frappe.model.document import Document
-from erpnext.accounts.utils import get_balance_on
-from collections import defaultdict
 import json
+from collections import defaultdict
+
+import frappe
+from erpnext.accounts.utils import get_balance_on
+from frappe.model.document import Document
 from frappe.utils import get_date_str
 
 
@@ -28,7 +29,6 @@ class SubscriptionPaymentReport(Document):
 			invoice = frappe.get_doc(entry.voucher_type, entry.voucher_no)
 			items = defaultdict(list)
 			for item in invoice.items:
-
 				items["item_code"].append(item.item_code)
 				items["item_name"].append(item.item_name)
 				items["item_qty"].append(item.qty)
@@ -81,9 +81,7 @@ class SubscriptionPaymentReport(Document):
 				"enteries",
 				{
 					"customer": invoice.customer,
-					"customer_name": frappe.get_value(
-						"Customer", invoice.customer, "customer_name"
-					),
+					"customer_name": frappe.get_value("Customer", invoice.customer, "customer_name"),
 					"voucher_type": entry.voucher_type,
 					"voucher_no": entry.voucher_no,
 					"voucher_status": invoice.status,
@@ -116,26 +114,23 @@ class SubscriptionPaymentReport(Document):
 		)
 
 	def get_outstanding(self):
-
 		# outstanding = sum(
-		# 	v or 0
-		# 	for v in frappe.get_all(
-		# 		"Sales Invoice",
-		# 		filters=[["name", "in", self.unique_invoices]],
-		# 		pluck="outstanding_amount",
-		# 	)
+		#     v or 0
+		#     for v in frappe.get_all(
+		#         "Sales Invoice",
+		#         filters=[["name", "in", self.unique_invoices]],
+		#         pluck="outstanding_amount",
+		#     )
 		# )
 		# return outstanding
-		outstanding_amount = get_balance_on(
-			date=self.to_date, party_type="Customer", party=self.customer
-		)
+		outstanding_amount = get_balance_on(date=self.to_date, party_type="Customer", party=self.customer)
 		return outstanding_amount
 
 	def _get_filters(self):
 		filters = {
 			"voucher_type": "Sales Invoice",
 			"party_type": "Customer",
-			"is_cancelled": 0
+			"is_cancelled": 0,
 		}
 		if self.from_date and self.to_date:
 			filters["posting_date"] = ["between", [self.from_date, self.to_date]]
@@ -172,7 +167,10 @@ class SubscriptionPaymentReport(Document):
 				if p.get("posting_date"):
 					d = p["posting_date"]
 					if not last_payment or d > last_payment["date"]:
-						last_payment = {"date": d, "amount": p.get("allocated_amount") or p.get("paid_amount")}
+						last_payment = {
+							"date": d,
+							"amount": p.get("allocated_amount") or p.get("paid_amount"),
+						}
 
 		if last_payment:
 			self.last_payment_date = last_payment["date"]
@@ -188,8 +186,7 @@ class SubscriptionPaymentReport(Document):
 				"docstatus": 1,
 				"customer": ["=", self.customer],
 				"posting_date": filters["posting_date"],
-			}
-			,
+			},
 		)
 		invoiced_amount = si_totals[0].grand_total or 0
 		total_qty = si_totals[0].total_qty or 0

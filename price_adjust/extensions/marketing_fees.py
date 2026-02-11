@@ -1,6 +1,6 @@
-from frappe.model.document import Document
-from erpnext.accounts.doctype.subscription.subscription import Subscription
 import frappe
+from erpnext.accounts.doctype.subscription.subscription import Subscription
+from frappe.model.document import Document
 
 
 class CustomSubscription(Subscription):
@@ -18,20 +18,15 @@ class CustomSubscription(Subscription):
 		plan_doc = frappe.get_doc("Subscription Plan", self.plans[0].plan)
 		marketing_fees = plan_doc.cost * (self.custom_marketing_percentage / 100)
 
-
 		# Validate Marketing Fees Item exists or create it
 		if not frappe.db.exists("Item", "Marketing Fees"):
 			item_group = frappe.get_value("Item", plan_doc.item, "item_group")
-			marketing_item = frappe.get_doc({
-				"doctype": "Item",
-				"item_code":"Marketing Fees",
-				"item_group": item_group
-			})
+			marketing_item = frappe.get_doc(
+				{"doctype": "Item", "item_code": "Marketing Fees", "item_group": item_group}
+			)
 			marketing_item.insert(ignore_permissions=True, ignore_mandatory=True)
 		else:
 			marketing_item = frappe.get_doc("Item", "Marketing Fees")
-
-
 
 		# Append the `marketing fees` Item to the invoice.
 		item = {
@@ -39,8 +34,7 @@ class CustomSubscription(Subscription):
 			"item_name": marketing_item.item_name,
 			"qty": 1,
 			"uom": marketing_item.stock_uom,
-			"rate": marketing_fees
-
+			"rate": marketing_fees,
 		}
 		invoice.append("items", item)
 		invoice.save()
@@ -49,7 +43,6 @@ class CustomSubscription(Subscription):
 	def validate_not_submitable_invoice(self):
 		if self.custom_marketing_percentage and self.submit_invoice == 1:
 			frappe.throw("Can't add marketing fees if `Submit Generated Invoice` checked.")
-
 
 	def validate(self):
 		super().validate()

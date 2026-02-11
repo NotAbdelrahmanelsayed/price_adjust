@@ -1,9 +1,7 @@
 app_name = "price_adjust"
 app_title = "Price Adjust"
 app_publisher = "Abdelrahman Elsayed"
-app_description = (
-    "Automatically apply scheduled, rule-based price increases with full control"
-)
+app_description = "Automatically apply scheduled, rule-based price increases with full control"
 app_email = "bedoelsayed785@gmail.com"
 app_license = "mit"
 
@@ -14,13 +12,13 @@ app_license = "mit"
 
 # Each item in the list will be shown as an app in the apps page
 # add_to_apps_screen = [
-# 	{
-# 		"name": "price_adjust",
-# 		"logo": "/assets/price_adjust/logo.png",
-# 		"title": "Price Adjust",
-# 		"route": "/price_adjust",
-# 		"has_permission": "price_adjust.api.permission.has_app_permission"
-# 	}
+#     {
+#         "name": "price_adjust",
+#         "logo": "/assets/price_adjust/logo.png",
+#         "title": "Price Adjust",
+#         "route": "/price_adjust",
+#         "has_permission": "price_adjust.api.permission.has_app_permission"
+#     }
 # ]
 
 # Includes in <head>
@@ -63,7 +61,7 @@ app_license = "mit"
 
 # website user home page (by Role)
 # role_home_page = {
-# 	"Role": "home_page"
+#     "Role": "home_page"
 # }
 
 # Generators
@@ -77,8 +75,8 @@ app_license = "mit"
 
 # add methods and filters to jinja environment
 # jinja = {
-# 	"methods": "price_adjust.utils.jinja_methods",
-# 	"filters": "price_adjust.utils.jinja_filters"
+#     "methods": "price_adjust.utils.jinja_methods",
+#     "filters": "price_adjust.utils.jinja_filters"
 # }
 
 # Installation
@@ -120,20 +118,18 @@ app_license = "mit"
 # Permissions evaluated in scripted ways
 
 # permission_query_conditions = {
-# 	"Event": "frappe.desk.doctype.event.event.get_permission_query_conditions",
+#     "Event": "frappe.desk.doctype.event.event.get_permission_query_conditions",
 # }
 #
 # has_permission = {
-# 	"Event": "frappe.desk.doctype.event.event.has_permission",
+#     "Event": "frappe.desk.doctype.event.event.has_permission",
 # }
 
 # DocType Class
 # ---------------
 # Override standard doctype classes
 
-override_doctype_class = {
-    "Subscription": "price_adjust.extensions.marketing_fees.CustomSubscription"
-}
+override_doctype_class = {"Subscription": "price_adjust.extensions.marketing_fees.CustomSubscription"}
 
 # Document Events
 # ---------------
@@ -141,13 +137,13 @@ override_doctype_class = {
 
 # extend_doctype_class = {"Subscription": "price_adjust.extensions.subscription.Subscription"}
 doc_events = {
-    "Subscription": {
-        "validate": [
-            "price_adjust.extensions.subscription.validate_increase_by_interval",
-            "price_adjust.extensions.subscription.init_next_increase_date",
-            # "price_adjust.extensions.subscription.apply_increase_and_set_next_date",
-        ]
-    }
+	"Subscription": {
+		"validate": [
+			"price_adjust.extensions.subscription.validate_increase_by_interval",
+			"price_adjust.extensions.subscription.init_next_increase_date",
+			# "price_adjust.extensions.subscription.apply_increase_and_set_next_date",
+		]
+	}
 }
 
 doctype_js = {"Subscription": "public/js/subscription.js"}
@@ -156,7 +152,7 @@ doctype_js = {"Subscription": "public/js/subscription.js"}
 # ---------------
 
 scheduler_events = {
-    "hourly": ["price_adjust.extensions.subscription.auto_increase_by_interval"],
+	"hourly": ["price_adjust.extensions.subscription.auto_increase_by_interval"],
 }
 
 # Testing
@@ -168,14 +164,14 @@ scheduler_events = {
 # ------------------------------
 #
 # override_whitelisted_methods = {
-# 	"frappe.desk.doctype.event.event.get_events": "price_adjust.event.get_events"
+#     "frappe.desk.doctype.event.event.get_events": "price_adjust.event.get_events"
 # }
 #
 # each overriding function accepts a `data` argument;
 # generated from the base implementation of the doctype dashboard,
 # along with any modifications made in other Frappe apps
 # override_doctype_dashboards = {
-# 	"Task": "price_adjust.task.get_dashboard_data"
+#     "Task": "price_adjust.task.get_dashboard_data"
 # }
 
 # exempt linked doctypes from being automatically cancelled
@@ -201,38 +197,38 @@ scheduler_events = {
 # --------------------
 
 # user_data_fields = [
-# 	{
-# 		"doctype": "{doctype_1}",
-# 		"filter_by": "{filter_by}",
-# 		"redact_fields": ["{field_1}", "{field_2}"],
-# 		"partial": 1,
-# 	},
-# 	{
-# 		"doctype": "{doctype_2}",
-# 		"filter_by": "{filter_by}",
-# 		"partial": 1,
-# 	},
-# 	{
-# 		"doctype": "{doctype_3}",
-# 		"strict": False,
-# 	},
-# 	{
-# 		"doctype": "{doctype_4}"
-# 	}
+#     {
+#         "doctype": "{doctype_1}",
+#         "filter_by": "{filter_by}",
+#         "redact_fields": ["{field_1}", "{field_2}"],
+#         "partial": 1,
+#     },
+#     {
+#         "doctype": "{doctype_2}",
+#         "filter_by": "{filter_by}",
+#         "partial": 1,
+#     },
+#     {
+#         "doctype": "{doctype_3}",
+#         "strict": False,
+#     },
+#     {
+#         "doctype": "{doctype_4}"
+#     }
 # ]
 
 # Authentication and authorization
 # --------------------------------
 
 # auth_hooks = [
-# 	"price_adjust.auth.validate"
+#     "price_adjust.auth.validate"
 # ]
 
 # Automatically update python controller files with type annotations for this app.
 # export_python_type_annotations = True
 
 # default_log_clearing_doctypes = {
-# 	"Logging DocType Name": 30  # days to retain logs
+#     "Logging DocType Name": 30  # days to retain logs
 # }
 
 # Translation

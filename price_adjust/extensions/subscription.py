@@ -1,104 +1,92 @@
 import frappe
-from frappe.utils import add_days, add_months, add_years, today
-from frappe.utils import get_date_str
+from frappe.utils import add_days, add_months, add_years, get_date_str, getdate, today
 
 
 def auto_increase_by_interval():
-    subscriptions = frappe.get_all(
-        "Subscription",
-        filters={
-            "status": ["not in", ["Completed", "Cancelled"]],
-            "custom_auto_increase_by_interval": 1,
-            "custom_next_fee_increase_date": ["<=", today()],
-        },
-        pluck="name",
-    )
+	subscriptions = frappe.get_all(
+		"Subscription",
+		filters={
+			"status": ["not in", ["Completed", "Cancelled"]],
+			"custom_auto_increase_by_interval": 1,
+			"custom_next_fee_increase_date": ["<=", today()],
+		},
+		pluck="name",
+	)
 
-    if subscriptions:
-        for sub in subscriptions:
-            doc = frappe.get_doc("Subscription", sub)
-            apply_increase_and_set_next_date(doc)
+	if subscriptions:
+		for sub in subscriptions:
+			doc = frappe.get_doc("Subscription", sub)
+			apply_increase_and_set_next_date(doc)
 
 
 def validate_increase_by_interval(doc, method=None):
-    if doc.get("custom_auto_increase_by_interval") != 1:
-        return
+	if doc.get("custom_auto_increase_by_interval") != 1:
+		return
 
-    if not doc.custom_increase_interval:
-        frappe.throw("Please Select Increase Interval (day, month, year)")
+	if not doc.custom_increase_interval:
+		frappe.throw("Please Select Increase Interval (day, month, year)")
 
-    if (
-        not doc.custom_increase_duration_count
-        or int(doc.custom_increase_duration_count) <= 0
-    ):
-        frappe.throw("increase duration count cannot be less than 1")
+	if not doc.custom_increase_duration_count or int(doc.custom_increase_duration_count) <= 0:
+		frappe.throw("increase duration count cannot be less than 1")
 
-    if doc.custom_increase_percentage <= 0:
-        frappe.throw("Increase percentage must be greater than 0")
+	if doc.custom_increase_percentage <= 0:
+		frappe.throw("Increase percentage must be greater than 0")
 
 
 def apply_increase_and_set_next_date(doc, method=None, force_increase=False):
-    if not doc.get("plans") or not doc.get("custom_increase_duration_count"):
-        return
+	if not doc.get("plans") or not doc.get("custom_increase_duration_count"):
+		return
 
-    if doc.get("custom_auto_increase_by_interval") != 1:
-        return
+	if doc.get("custom_auto_increase_by_interval") != 1:
+		return
 
-    today_str = get_date_str(today())
-    # Adjust subscription
-    if doc.custom_increase_percentage:
-        rows = doc.plans
-        for row in rows:
-            plan = frappe.get_doc("Subscription Plan", row.plan)
+	# Adjust subscription
+	if doc.custom_increase_percentage:
+		rows = doc.plans
+		for row in rows:
+			plan = frappe.get_doc("Subscription Plan", row.plan)
+			last_modified = plan.custom_last_modified
+			# If the plan modified today, ignore it.
+			if last_modified and getdate(last_modified) == getdate(today()) and not force_increase:
+				continue
+			cost = plan.cost * (1 + (doc.custom_increase_percentage / 100))
+			frappe.db.set_value("Subscription Plan", plan.name, "cost", cost)
+			frappe.db.set_value(
+				"Subscription Plan",
+				plan.name,
+				"custom_last_modified",
+				get_date_str(today()),
+			)
 
-            # If the plan modified today, ignore it.
-            if (
-                get_date_str(plan.custom_last_modified or today_str) == today_str
-                and not force_increase
-            ):
-                continue
-            cost = plan.cost * (1 + (doc.custom_increase_percentage / 100))
-            frappe.db.set_value("Subscription Plan", plan.name, "cost", cost)
-            frappe.db.set_value(
-                "Subscription Plan",
-                plan.name,
-                "custom_last_modified",
-                today_str,
-            )
+	init_next_increase_date(doc)
 
-    init_next_increase_date(doc)
-
-    return doc
+	return doc
 
 
 def init_next_increase_date(doc, method=None):
-    if doc.custom_auto_increase_by_interval != 1:
-        return
+	if doc.custom_auto_increase_by_interval != 1:
+		return
 
-    base_date = (
-        doc.custom_next_fee_increase_date or doc.start_date or get_date_str(today())
-    )
-    n = int(doc.custom_increase_duration_count or 0)
-    interval = doc.custom_increase_interval
+	base_date = doc.custom_next_fee_increase_date or doc.start_date or get_date_str(today())
+	n = int(doc.custom_increase_duration_count or 0)
+	interval = doc.custom_increase_interval
 
-    if not interval or n <= 0:
-        return
+	if not interval or n <= 0:
+		return
 
-    if interval == "Day":
-        next_date = add_days(base_date, n)
-    elif interval == "Week":
-        next_date = add_days(base_date, n * 7)
-    elif interval == "Month":
-        next_date = add_months(base_date, n)
-    elif interval == "Year":
-        next_date = add_years(base_date, n)
-    frappe.db.set_value(
-        "Subscription", doc.name, "custom_next_fee_increase_date", next_date
-    )
+	if interval == "Day":
+		next_date = add_days(base_date, n)
+	elif interval == "Week":
+		next_date = add_days(base_date, n * 7)
+	elif interval == "Month":
+		next_date = add_months(base_date, n)
+	elif interval == "Year":
+		next_date = add_years(base_date, n)
+	frappe.db.set_value("Subscription", doc.name, "custom_next_fee_increase_date", next_date)
 
 
 @frappe.whitelist()
 def force_increase(docname):
-    doc = frappe.get_doc("Subscription", docname)
-    apply_increase_and_set_next_date(doc, force_increase=True)
-    return doc.custom_next_fee_increase_date
+	doc = frappe.get_doc("Subscription", docname)
+	apply_increase_and_set_next_date(doc, force_increase=True)
+	return doc.custom_next_fee_increase_date

@@ -25,3 +25,7 @@ To make sure that we are safe hundered percent, most of the time will be spent o
 
 ## Estimation
 8-13 hours
+
+## **Estimation Edit**
+Spent 1.5 hours solving the server problem while backing up the site on port 82
+8-15
